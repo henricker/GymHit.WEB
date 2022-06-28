@@ -1,9 +1,11 @@
-import { Box, Button, Flex, Grid, Heading, Image, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Grid, Heading, Image, Stack, useToast } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Input } from '../components/Form/Input';
-import Link from 'next/link';
+import { Input } from '../components/Form/Input';;
+import { useAuth } from '../context/AuthContext';
+import { api } from '../services/axios';
+import { useRouter } from 'next/router';
 
 type SignInFormData = {
   email: string;
@@ -22,8 +24,32 @@ export default function SignIn(): JSX.Element {
 
   const { errors } = formState;
 
-  const handleSignIn: SubmitHandler<SignInFormData> = (values): void => {
-    console.log(values);
+  const auth = useAuth();
+  const toast = useToast();
+
+  const router = useRouter();
+
+  const handleSignIn: SubmitHandler<SignInFormData> = async (values): Promise<void> => {
+    try {
+      const response = await api.post('/auth', values);
+
+      auth.login({ 
+          accessToken: response.data.accessToken, 
+          email: response.data.email, 
+          profile_url: null, 
+          fantasy_name: response.data.fantasy_name 
+      });
+
+      router.push('/dashboard');
+    } catch(err) {
+      toast({
+        title: 'Erro ao se autenticar',
+        description: 'Email ou senha inválidos',
+        duration: 1000,
+        status: 'warning',
+        position: 'top-start'
+      })
+    }
   };
 
   return (
@@ -82,7 +108,7 @@ export default function SignIn(): JSX.Element {
         </Button>
 
         <Heading fontSize='0.875rem' fontWeight='medium'>
-          Ainda não tem uma conta? <Heading display='inline' fontSize='0.875rem' color='#F54A48' fontWeight='medium'>Criar Conta</Heading>  
+          Ainda não tem uma conta? <Heading cursor='pointer' display='inline' fontSize='0.875rem' color='#F54A48' fontWeight='medium' onClick={() => router.push('/register')}>Criar Conta</Heading>  
         </Heading>
         </Box>
       </Flex>

@@ -38,7 +38,7 @@ export function Header(): JSX.Element {
 
       <Logo />
 
-      {isWideVersion && <SearchBox />}
+      {isWideVersion && <SearchBox placeholder='Buscar na plataforma'/>}
 
       <NotificationsNav />
       <Profile showProfileData={isWideVersion} />

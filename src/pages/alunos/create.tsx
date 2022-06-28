@@ -22,22 +22,16 @@ import { queryClient } from '../../services/queryClient';
 
 type CreateUserFormData = {
   name: string;
-  password: string;
+  cpf: string;
+  telephone: string;
   email: string;
-  password_confirmation: string;
 };
 
 const CreateUserSchema = yup.object().shape({
   name: yup.string().required('Nome é obrigatório'),
-  email: yup.string().email('Email inválido').required('Email é obrigatório'),
-  password: yup
-    .string()
-    .required('Senha é obrigatória')
-    .min(6, 'Senha deve ter no mínimo 6 caracteres'),
-
-  password_confirmation: yup
-    .string()
-    .oneOf([null, yup.ref('password')], 'As senhas não correspondem'),
+  cpf: yup.string().required('CPF é obrigatório').matches(/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/),
+  telephone: yup.string().matches(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/, 'Celular inválido').required('Celular obrigatório'),
+  email: yup.string().required('Email é obrigatório').email('Email inválido')
 });
 
 export default function Create(): JSX.Element {
@@ -45,7 +39,7 @@ export default function Create(): JSX.Element {
 
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
-      const response = await api.post('users', {
+      const response = await api.post('pupils', {
         user: {
           ...user,
           created_at: new Date(),
@@ -88,7 +82,7 @@ export default function Create(): JSX.Element {
           onSubmit={handleSubmit(handleSubmitUser)}
         >
           <Heading size="lg" fontWeight="normal">
-            Criar usuário
+            Matricular aluno
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -102,26 +96,26 @@ export default function Create(): JSX.Element {
                 error={errors.name}
               />
               <Input
-                name="email"
-                label="E-mail"
-                {...register('email')}
-                error={errors.email}
+                name="cpf"
+                label="CPF"
+                {...register('cpf')}
+                error={errors.cpf}
               />
             </SimpleGrid>
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Input
-                name="password"
-                label="Senha"
-                type="password"
+                name="telephone"
+                label="Celular"
+                type="text"
                 {...register('password')}
-                error={errors.password}
+                error={errors.telephone}
               />
               <Input
-                name="password_confirmation"
-                type="password"
-                label="Confirmação de senha"
-                {...register('password_confirmation')}
-                error={errors.password_confirmation}
+                name="email"
+                label="Email"
+                type="email"
+                {...register('email')}
+                error={errors.email}
               />
             </SimpleGrid>
           </VStack>

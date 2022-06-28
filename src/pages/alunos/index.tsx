@@ -28,6 +28,7 @@ import { Pagination } from '../../components/Pagination';
 import { getUsers, useUsers } from '../../services/hooks/useUsers';
 import { queryClient } from '../../services/queryClient';
 import { api } from '../../services/axios';
+import { SearchBox } from '../../components/Header/SearchBox';
 
 export default function Users({ users }): JSX.Element {
   const [page, setPage] = useState(1);
@@ -58,20 +59,21 @@ export default function Users({ users }): JSX.Element {
         <Box flex="1" borderRadius={8} bg="gray.800" p="8">
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
-              Usuários
+              Alunos
               {!isLoading && isFetching && (
                 <Spinner size="sm" color="gray.500" ml="4" />
               )}
             </Heading>
-            <NextLink href="/users/create" passHref>
+            <SearchBox placeholder='Busca por nome/CPF' inputBg='gray.200'/>
+            <NextLink href="/alunos/create" passHref>
               <Button
                 as="a"
                 size="sm"
                 fontSize="sm"
-                colorScheme="pink"
+                bg="#F54A48"
                 leftIcon={<Icon as={RiAddLine} fontSize="20" />}
               >
-                Criar novo
+                Matricular
               </Button>
             </NextLink>
           </Flex>
@@ -81,7 +83,7 @@ export default function Users({ users }): JSX.Element {
             </Flex>
           ) : error ? (
             <Flex justify="center">
-              <Text>Falha ao obter dados dos usuários.</Text>
+              <Text>Falha ao obter dados dos alunos.</Text>
             </Flex>
           ) : (
             <>
@@ -111,7 +113,10 @@ export default function Users({ users }): JSX.Element {
                             <Text fontWeight="bold">{user.name}</Text>
                           </Link>
                           <Text fontSize="sm" color="gray.300">
-                            {user.email}
+                            {user.cpf}
+                          </Text>
+                          <Text fontSize="sm" color="gray.300">
+                            {user.telephone}
                           </Text>
                         </Box>
                       </Td>
@@ -150,7 +155,7 @@ export default function Users({ users }): JSX.Element {
               <Pagination
                 onChangePage={setPage}
                 currentPage={page}
-                totalCountOfRegisters={200}
+                totalCountOfRegisters={data.totalCount}
               />
             </>
           )}

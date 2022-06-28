@@ -1,10 +1,13 @@
 import { Box, Flex, SimpleGrid, Text } from '@chakra-ui/react';
 import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { theme } from '../../styles/theme';
 import { Header } from '../components/Header';
 
 import { Sidebar } from '../components/Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 // This data is fake, just to build dashboard graphs
 const Chart = dynamic(() => import('react-apexcharts'), {
@@ -67,6 +70,17 @@ const series = [
 ];
 
 export default function Dashboard(): JSX.Element {
+
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = auth.getAuth();
+    if(!user) {
+      router.push('/');
+    }
+  }, [])
+
   return (
     <Flex direction="column" h="100vh">
       <Header />

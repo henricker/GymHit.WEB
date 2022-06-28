@@ -6,8 +6,9 @@ import * as yup from 'yup';
 import { Input } from "../components/Form/Input";
 import { Step, Steps, useSteps } from 'chakra-ui-steps';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { telephoneMask } from "../util/mask/telephone-mask";
-import { InputImage } from "../components/Form/InputImage";
+import { api } from "../services/axios";
+import { useRouter } from 'next/router';
+import { useAuth } from "../context/AuthContext";
 
 const RegisterSchema = yup.object().shape({
     email: yup.string().email('Email inválido').required('Email obrigatório'),
@@ -15,22 +16,34 @@ const RegisterSchema = yup.object().shape({
     password: yup.string().required('Senha obrigatória'),
     cnpj: yup.string().matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/, 'CNPJ inválido'),
     fantasy_name: yup.string().required('Nome fantasia é obrigatório'),
-    coorporate_name: yup.string().required('Nome fantasia é obrigatório')
+    coorporate_name: yup.string().required('Nome fantasia é obrigatório'),
+    street: yup.string().required('Rua é obrigatório'),
+    district: yup.string().required('Bairro é obrigatório'),
+    city: yup.string().required('Cidade é obrigatório'),
+    number: yup.string().required('Número é obrigatório'),
 });
 
 type RegisterFormData = {
     email: string;
     password: string;
     telephone: string;
-    logo: any;
     cnpj: string;
     fantasy_name: string;
+    coorporate_name: string;
+    street: string;
+    city: string;
+    number: string;
+    district: string;
 };
 
 export default function Register() {
     const { nextStep, prevStep, activeStep } = useSteps({
         initialStep: 0,
     });
+
+    const router = useRouter();
+
+    const auth = useAuth();
 
     const toast = useToast();
 
@@ -40,9 +53,46 @@ export default function Register() {
 
     const { errors } = formState;
 
-    const handleSignIn: SubmitHandler<RegisterFormData> = (values): void => {
-        console.log(values);
-      };
+    const handleSignIn: SubmitHandler<RegisterFormData> = async (values): Promise<void> => {
+        try {
+            if(Object.keys(errors).length > 0) {
+                toast({
+                    title: 'Erros no formulário',
+                    description: "Corrija os erros no formulário e reenvie",
+                    status: 'error',
+                    duration: 2000,
+                    isClosable: true,
+                  })
+                  return;
+            }
+            const response = await api.post('/admins', values);
+
+            auth.login({ 
+                accessToken: response.data.accessToken, 
+                email: response.data.email, 
+                profile_url: null, 
+                fantasy_name: response.data.fantasy_name 
+            });
+
+            toast({
+                title: 'Academia cadastrada com sucesso!',
+                status: 'success',
+                duration: 1000,
+                isClosable: true
+            });
+
+            router.push('/dashboard')
+        } catch(err) {
+            toast({
+                title: 'Erro ao cadastrar academia',
+                description: "Tente novamente mais tarde",
+                status: 'error',
+                duration: 2000,
+                isClosable: true,
+            })
+        }
+     
+    };
 
     useEffect(() => {
         console.log(errors)
@@ -80,30 +130,9 @@ export default function Register() {
                     error={errors?.telephone}
                     labelColor='#7C7C7C'
                     labelWeight='semibold'
-                    label="Celular"
+                    label="Telefone"
                     {...register('telephone')}
                 />
-
-               <InputImage
-                    marginTopLabel='1rem'
-                    name="user_logo"
-                    id="user_logo"
-                    labelColor='#7C7C7C'
-                    labelWeight='semibold'
-                    label="Logo"
-                    {...register('user_logo')}
-               />
-               {/* <Input
-                    marginTopLabel='1rem'
-                    name="user_logo"
-                    id="user_logo"
-                    type="file"
-                    error={errors?.telephone}
-                    labelColor='#7C7C7C'
-                    labelWeight='semibold'
-                    label="Logo"
-                    {...register('user_logo')}
-                /> */}
             </Box>
         </Flex>
     )
@@ -152,12 +181,12 @@ export default function Register() {
                 <Input
                     name="address_street"
                     id="address_street"
-                    error={errors?.address_street}
+                    error={errors?.street}
                     type="email"
                     labelColor='#7C7C7C'
                     labelWeight='semibold'
                     label="Rua"
-                    {...register('address_street')}
+                    {...register('street')}
                 />
                 <Input
                     marginTopLabel='1rem'
@@ -167,29 +196,29 @@ export default function Register() {
                     labelColor='#7C7C7C'
                     labelWeight='semibold'
                     label="Bairro"
-                    {...register('address_district')}
+                    {...register('district')}
                 />
             </Box>
             <Box width='45%'>
                 <Input
-                    name="address_number"
-                    id="address_number"
-                    error={errors?.cnpj}
+                    name="number"
+                    id="number"
+                    error={errors?.number}
                     labelColor='#7C7C7C'
                     labelWeight='semibold'
                     label="Número"
-                    {...register('address_number')}
+                    {...register('number')}
                 />
 
                 <Input
                     marginTopLabel='1rem'
-                    name="address_city"
-                    id="address_city"
-                    error={errors?.cnpj}
+                    name="city"
+                    id="city"
+                    error={errors?.city}
                     labelColor='#7C7C7C'
                     labelWeight='semibold'
                     label="Cidade"
-                    {...register('address_city')}
+                    {...register('city')}
                 />
             </Box>
         </Flex>
@@ -211,7 +240,6 @@ export default function Register() {
                 padding="8"
                 borderRadius={8}
                 flexDir="column"
-                onSubmit={handleSubmit(handleSignIn)}
             >
             <Image src='logo.svg' width={200} height={200} mt='-5rem' mb='2rem'/>
             <Box ml='2rem'>
@@ -254,19 +282,13 @@ export default function Register() {
                     isLoading={formState.isSubmitting}
                     mb="3.82rem"
                     onClick={() => {
-                        console.log(activeStep)
+
                         if(activeStep < steps.length - 1) {
                             nextStep();
                         }
 
-                        if(Object.keys(errors).length > 0) {
-                            toast({
-                                title: 'Erros no formulário',
-                                description: "Corrija os erros no formulário e reenvie",
-                                status: 'error',
-                                duration: 2000,
-                                isClosable: true,
-                              })
+                        if(activeStep + 1 === steps.length) {
+                            handleSubmit(handleSignIn)()
                         }
                     }}
                 >
@@ -274,7 +296,7 @@ export default function Register() {
                 </Button>
             </Flex>
             <Heading fontSize='0.875rem' fontWeight='medium'>
-                Já possui uma conta? <Heading display='inline' fontSize='0.875rem' color='#F54A48' fontWeight='medium'>Faça login</Heading>  
+                Já possui uma conta? <Heading cursor='pointer' display='inline' fontSize='0.875rem' color='#F54A48' fontWeight='medium' onClick={() => router.push('/')}>Faça login</Heading>  
             </Heading>
             </Box>
             </Flex>

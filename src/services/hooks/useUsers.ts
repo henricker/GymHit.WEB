@@ -4,7 +4,8 @@ import { api } from '../axios';
 type User = {
   id: number;
   name: string;
-  email: string;
+  cpf: string;
+  telephone: string;
   createdAt: string;
 };
 
@@ -14,19 +15,21 @@ type GetUsersRequest = {
 };
 
 export async function getUsers(page: number): Promise<GetUsersRequest> {
-  const { data, headers } = await api.get('users', {
+  const { data, headers } = await api.get('pupils', {
     params: {
       page,
     },
+    headers: {
+      authorization: `Bearer ${JSON.parse(localStorage.getItem('auth')).accessToken}`
+    }
   });
 
-  const totalCount = Number(headers['x-total-count']);
-
-  const users = data.users.map(user => {
+  const users = data.pupils.map(user => {
     return {
       id: user.id,
       name: user.name,
-      email: user.email,
+      cpf: user.cpf,
+      telephone: user.telephone,
       createdAt: new Date(user.created_at).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: 'long',
@@ -34,6 +37,8 @@ export async function getUsers(page: number): Promise<GetUsersRequest> {
       }),
     };
   });
+
+  const totalCount = data.totalCounts;
 
   return {
     users,

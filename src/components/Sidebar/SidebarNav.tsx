@@ -4,6 +4,7 @@ import {
   RiDashboardLine,
   RiGitMergeLine,
   RiInputMethodLine,
+  RiMoneyCnyBoxFill,
 } from 'react-icons/ri';
 import { NavigationSection } from './NavigationSection';
 import { NavLink } from './NavLink';
@@ -15,16 +16,22 @@ export function NavigationBar(): JSX.Element {
         <NavLink icon={RiDashboardLine} href="/dashboard">
           Dashboard
         </NavLink>
-        <NavLink icon={RiContactsLine} href="/users">
-          Usuários
+        <NavLink icon={RiContactsLine} href="/alunos">
+          Alunos
+        </NavLink>
+        <NavLink icon={RiContactsLine} href="/instructors">
+          Instrutores
+        </NavLink>
+        <NavLink icon={RiMoneyCnyBoxFill} href="/payments">
+          Pagamentos
         </NavLink>
       </NavigationSection>
-      <NavigationSection title="AUTOMAÇÃO">
+      <NavigationSection title="ACADEMIA">
         <NavLink icon={RiInputMethodLine} href="/forms">
-          Formulários
+          Equipamentos
         </NavLink>
         <NavLink icon={RiGitMergeLine} href="/automation">
-          Automação
+          Pendências
         </NavLink>
       </NavigationSection>
     </Stack>
