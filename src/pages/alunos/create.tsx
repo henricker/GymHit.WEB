@@ -6,6 +6,7 @@ import {
   Heading,
   HStack,
   SimpleGrid,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import Link from 'next/link';
@@ -19,6 +20,8 @@ import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
 import { api } from '../../services/axios';
 import { queryClient } from '../../services/queryClient';
+import { useAuth } from '../../context/AuthContext';
+import { useEffect } from 'react';
 
 type CreateUserFormData = {
   name: string;
@@ -36,21 +39,53 @@ const CreateUserSchema = yup.object().shape({
 
 export default function Create(): JSX.Element {
   const nextRouter = useRouter();
+  const auth = useAuth();
+
+  useEffect(() => {
+    const user = auth.getAuth();
+    if(!user) {
+      nextRouter.push('/');
+    }
+  }, []);
+
+  const toast = useToast();
 
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
-      const response = await api.post('pupils', {
-        user: {
+      try {
+        const response = await api.post('pupils', {
           ...user,
-          created_at: new Date(),
-        },
-      });
+          admin_id: auth.user.id,
+        }, {
+          headers: {
+            Authorization: `Bearer ${auth.user.accessToken}`
+          }
+        });
 
-      return response.data.user;
+        toast({
+          status: 'success',
+          title: 'Aluno matriculado com sucesso!',
+          position: 'top-left',
+          onCloseComplete: async () => {
+            await nextRouter.push('/alunos');
+          },
+          duration: 1000
+        })
+  
+        return response.data.user;
+      } catch(err) {
+        toast({
+          title: 'Erro ao matrícular aluno',
+          duration: 1000,
+          status: 'warning',
+          position: 'top-start'
+        })
+      }
+
     },
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries('users');
+        await queryClient.invalidateQueries('pupils');
       },
     }
   );
@@ -61,8 +96,6 @@ export default function Create(): JSX.Element {
 
   const handleSubmitUser: SubmitHandler<CreateUserFormData> = async values => {
     await createUser.mutateAsync(values);
-
-    await nextRouter.push('/users');
   };
 
   const { errors } = formState;
@@ -107,7 +140,7 @@ export default function Create(): JSX.Element {
                 name="telephone"
                 label="Celular"
                 type="text"
-                {...register('password')}
+                {...register('telephone')}
                 error={errors.telephone}
               />
               <Input
@@ -128,7 +161,7 @@ export default function Create(): JSX.Element {
                 </Button>
               </Link>
 
-              <Button colorScheme="pink" type="submit">
+              <Button bg="#F54A48" type="submit">
                 Salvar
               </Button>
             </HStack>

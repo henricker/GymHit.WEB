@@ -14,14 +14,15 @@ type GetUsersRequest = {
   users: User[];
 };
 
-export async function getUsers(page: number): Promise<GetUsersRequest> {
+export async function getUsers(page: number, pattern?: string): Promise<GetUsersRequest> {
   const { data, headers } = await api.get('pupils', {
     params: {
       page,
+      pattern: pattern,
     },
     headers: {
       authorization: `Bearer ${JSON.parse(localStorage.getItem('auth')).accessToken}`
-    }
+    },
   });
 
   const users = data.pupils.map(user => {
@@ -48,11 +49,12 @@ export async function getUsers(page: number): Promise<GetUsersRequest> {
 
 export function useUsers(
   page: number,
-  options?: UseQueryOptions
+  options?: UseQueryOptions,
+  pattern?: string
 ): UseQueryResult<GetUsersRequest, unknown> {
   return useQuery(
-    ['users', page],
-    () => getUsers(page),
+    ['users', page, pattern],
+    () => getUsers(page, pattern),
     {
       staleTime: 1000 * 60 * 10, // 10 minutes
     },

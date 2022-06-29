@@ -20,7 +20,7 @@ import {
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { MdOutlineRemoveCircleOutline } from 'react-icons/md';
 import NextLink from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
@@ -29,18 +29,33 @@ import { getUsers, useUsers } from '../../services/hooks/useUsers';
 import { queryClient } from '../../services/queryClient';
 import { api } from '../../services/axios';
 import { SearchBox } from '../../components/Header/SearchBox';
+import { useRouter } from 'next/router';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Users({ users }): JSX.Element {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error, isFetching } = useUsers(page, {
+  const [pattern, setPattern] = useState<string>(null);
+  // const [clicked, setClicked] = useState<boolean>(false);
+
+  const { data, isLoading, error, isFetching, refetch } = useUsers(page, {
     initialData: users,
-  });
+  }, pattern);
+
+  const router = useRouter();
+  const auth = useAuth();
+
+  useEffect(() => {
+    const user = auth.getAuth();
+    if(!user) {
+      router.push('/');
+    }
+  }, [])
 
   async function handlePrefetchUser(user_id: number): Promise<void> {
     await queryClient.prefetchQuery(
       ['user', user_id],
       async () => {
-        const response = await api.get(`users/${user_id}`);
+        const response = await api.get(`pupils/${user_id}`);
 
         return response.data;
       },
@@ -64,7 +79,7 @@ export default function Users({ users }): JSX.Element {
                 <Spinner size="sm" color="gray.500" ml="4" />
               )}
             </Heading>
-            <SearchBox placeholder='Busca por nome/CPF' inputBg='gray.200'/>
+            <SearchBox placeholder='Busca por nome/CPF' inputBg='gray.200' exec={setPattern}/>
             <NextLink href="/alunos/create" passHref>
               <Button
                 as="a"

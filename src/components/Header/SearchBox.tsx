@@ -1,12 +1,16 @@
 import { Flex, Icon, Input } from '@chakra-ui/react';
+import { useState } from 'react';
 import { RiSearchLine } from 'react-icons/ri';
 
 type SearchBoxType = {
   placeholder: string;
   inputBg?: string;
+  exec?: (pattern: string) => void;
 }
 
-export function SearchBox({ placeholder, inputBg}: SearchBoxType): JSX.Element {
+export function SearchBox({ placeholder, inputBg, exec }: SearchBoxType): JSX.Element {
+  const [pattern, setPattern] = useState<string>(null);
+
   return (
     <Flex
       as="label"
@@ -22,6 +26,7 @@ export function SearchBox({ placeholder, inputBg}: SearchBoxType): JSX.Element {
       borderRadius="full"
     >
       <Input
+        onChange={(event) => setPattern(event.target.value)}
         color={inputBg ?? 'gray.50'}
         variant="unstyled"
         px="4"
@@ -30,7 +35,7 @@ export function SearchBox({ placeholder, inputBg}: SearchBoxType): JSX.Element {
         _placeholder={{ color: 'gray.400' }}
       />
 
-      <Icon as={RiSearchLine} />
+      <Icon as={RiSearchLine} cursor="pointer" onClick={() => exec(pattern)}/>
     </Flex>
   );
 }

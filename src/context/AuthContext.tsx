@@ -6,6 +6,7 @@ type AuthContextProps = {
 }
 
 type AuthProps = {
+    id: string,
     email: string;
     accessToken: string;
     profile_url: string;
