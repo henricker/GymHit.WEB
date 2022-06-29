@@ -34,6 +34,7 @@ export default function SignIn(): JSX.Element {
       const response = await api.post('/auth', values);
 
       auth.login({ 
+          id: response.data.id,
           accessToken: response.data.accessToken, 
           email: response.data.email, 
           profile_url: null, 
