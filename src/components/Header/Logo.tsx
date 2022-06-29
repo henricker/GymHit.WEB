@@ -1,7 +1,7 @@
-import { Image } from '@chakra-ui/react';
+import { Heading } from '@chakra-ui/react';
 
-export function Logo(): JSX.Element {
+export function Logo(): JSX.Element { 
   return (
-    <Image src='./logo.svg' width={200} height={200}/>
+    <Heading color="#F54A48">GymHit</Heading>
   );
 }
