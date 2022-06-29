@@ -20,7 +20,7 @@ export function Pagination({
   onChangePage,
   totalCountOfRegisters,
   currentPage = 1,
-  registersPerPage = 10,
+  registersPerPage = 4,
 }: PaginationProps): JSX.Element {
   const lastPage = Math.ceil(totalCountOfRegisters / registersPerPage);
 
