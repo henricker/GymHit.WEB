@@ -1,6 +1,6 @@
 import { Grid, Flex, Box, Heading, Stack } from "@chakra-ui/layout";
 import { Button, Image, useToast } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from 'yup';
 import { Input } from "../components/Form/Input";
@@ -67,21 +67,23 @@ export default function Register() {
             }
             const response = await api.post('/admins', values);
 
-            auth.login({ 
-                accessToken: response.data.accessToken, 
-                email: response.data.email, 
-                profile_url: null, 
-                fantasy_name: response.data.fantasy_name 
+            auth.login({
+                accessToken: response.data.accessToken,
+                email: response.data.email,
+                profile_url: null,
+                fantasy_name: response.data.fantasy_name,
+                id: response.data.id
             });
 
             toast({
                 title: 'Academia cadastrada com sucesso!',
                 status: 'success',
                 duration: 1000,
-                isClosable: true
+                isClosable: true,
+                onCloseComplete: () => {
+                    router.push('/dashboard')
+                }
             });
-
-            router.push('/dashboard')
         } catch(err) {
             toast({
                 title: 'Erro ao cadastrar academia',

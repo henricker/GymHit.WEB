@@ -30,7 +30,6 @@ export const InputBase: ForwardRefRenderFunction<
       {label && <FormLabel htmlFor={name} fontSize={labelSize} color={labelColor} fontWeight={labelWeight} mt={marginTopLabel} mb={marginBottomLabel} >{label}</FormLabel>}
       <Inputchakra
         name={name}
-        type="string"
         id="email"
         focusBorderColor="#F54A48"
         bgColor="gray.900"

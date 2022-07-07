@@ -41,7 +41,16 @@ export default function SignIn(): JSX.Element {
           fantasy_name: response.data.fantasy_name 
       });
 
-      router.push('/dashboard');
+      toast({
+        title: 'Login efetuado com sucesso!',
+        description: 'Você será direcionado ao dashboard',
+        duration: 1000,
+        status: 'success',
+        position: 'top-start',
+        onCloseComplete: () => {
+          router.push('/dashboard');
+        }
+      })
     } catch(err) {
       toast({
         title: 'Erro ao se autenticar',
