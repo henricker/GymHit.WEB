@@ -42,13 +42,13 @@ const options: ApexOptions = {
       color: theme.colors.gray[600],
     },
     categories: [
-      '2022-03-01T00:00:00.000Z',
-      '2022-03-02T00:00:00.000Z',
-      '2022-03-03T00:00:00.000Z',
-      '2022-03-04T00:00:00.000Z',
-      '2022-03-05T00:00:00.000Z',
-      '2022-03-06T00:00:00.000Z',
-      '2022-03-07T00:00:00.000Z',
+      '2022-07-07T00:00:00.000Z',
+      '2022-07-08T00:00:00.000Z',
+      '2022-07-09T00:00:00.000Z',
+      '2022-07-10T00:00:00.000Z',
+      '2022-07-11T00:00:00.000Z',
+      '2022-07-12T00:00:00.000Z',
+      '2022-07-13T00:00:00.000Z',
     ],
   },
   fill: {
@@ -64,10 +64,17 @@ const options: ApexOptions = {
 
 const series = [
   {
-    name: 'series1',
-    data: [31, 120, 10, 28, 61, 18, 109],
+    name: 'newStudentsGym',
+    data: [9, 2, 0, 0, 5, 9, 1],
   },
 ];
+
+const seriesTotalGains = [
+  {
+    name: 'gains',
+    data: [540, 120, 0, 0, 300, 540, 60]
+  }
+]
 
 export default function Dashboard(): JSX.Element {
 
@@ -94,8 +101,8 @@ export default function Dashboard(): JSX.Element {
             <Chart options={options} series={series} type="area" height={160} />
           </Box>
           <Box p={['6', '8']} bg="gray.800" borderRadius={8}>
-            <Text>Taxa de abertura</Text>
-            <Chart options={options} series={series} type="area" height={160} />
+            <Text>Ganhos da semana</Text>
+            <Chart options={options} series={seriesTotalGains} type="area" height={160} />
           </Box>
         </SimpleGrid>
       </Flex>

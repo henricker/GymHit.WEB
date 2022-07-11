@@ -4,10 +4,21 @@ import {
   Button,
   Checkbox,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
   Icon,
+  Image,
+  Input,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
   Table,
   Tbody,
@@ -16,26 +27,33 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { MdOutlineRemoveCircleOutline } from 'react-icons/md';
 import NextLink from 'next/link';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
 import { Pagination } from '../../components/Pagination';
 import { getUsers, useUsers } from '../../services/hooks/useUsers';
-import { queryClient } from '../../services/queryClient';
-import { api } from '../../services/axios';
 import { SearchBox } from '../../components/Header/SearchBox';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../context/AuthContext';
+import { ModalDetails } from '../../components/alunos/ModalDetails';
+import { queryClient } from '../../services/queryClient';
+import { api } from '../../services/axios';
 
 export default function Users({ users }): JSX.Element {
   const [page, setPage] = useState(1);
   const [pattern, setPattern] = useState<string>(null);
-  // const [clicked, setClicked] = useState<boolean>(false);
+  const [pupilId, setPupilId] = useState<number>(null);
+  const {isOpen, onOpen, onClose } = useDisclosure();
+  const [pupil, setPupil] = useState(null);
+
+  const initialRef = React.useRef(null)
+  const finalRef = React.useRef(null)
 
   const { data, isLoading, error, isFetching, refetch } = useUsers(page, {
     initialData: users,
@@ -49,14 +67,15 @@ export default function Users({ users }): JSX.Element {
     if(!user) {
       router.push('/');
     }
-  }, [])
+  }, []);
 
   async function handlePrefetchUser(user_id: number): Promise<void> {
     await queryClient.prefetchQuery(
       ['user', user_id],
       async () => {
         const response = await api.get(`pupils/${user_id}`);
-
+    
+        setPupil(response.data);
         return response.data;
       },
       {
@@ -64,6 +83,10 @@ export default function Users({ users }): JSX.Element {
       }
     );
   }
+
+  useEffect(() => {
+    pupilId && handlePrefetchUser(pupilId);
+  }, [pupilId]);
 
   return (
     <Box>
@@ -92,6 +115,15 @@ export default function Users({ users }): JSX.Element {
               </Button>
             </NextLink>
           </Flex>
+          <ModalDetails
+            finalRef={finalRef}
+            initialRef={initialRef}
+            isOpen={isOpen}
+            onClose={onClose}
+            key="modal-details"
+            pupil={pupil}
+            onOpen={onOpen}
+          />
           {isLoading ? (
             <Flex justify="center">
               <Spinner />
@@ -123,15 +155,14 @@ export default function Users({ users }): JSX.Element {
                         <Box>
                           <Link
                             color="purple.400"
-                            onMouseEnter={() => handlePrefetchUser(user.id)}
+                            onClick={() => {
+                              setPupilId(user.id)
+                            }}
                           >
                             <Text fontWeight="bold">{user.name}</Text>
                           </Link>
                           <Text fontSize="sm" color="gray.300">
                             {user.cpf}
-                          </Text>
-                          <Text fontSize="sm" color="gray.300">
-                            {user.telephone}
                           </Text>
                         </Box>
                       </Td>

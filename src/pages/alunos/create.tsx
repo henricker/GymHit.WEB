@@ -34,7 +34,9 @@ const CreateUserSchema = yup.object().shape({
   name: yup.string().required('Nome é obrigatório'),
   cpf: yup.string().required('CPF é obrigatório').matches(/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/),
   telephone: yup.string().matches(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/, 'Celular inválido').required('Celular obrigatório'),
-  email: yup.string().required('Email é obrigatório').email('Email inválido')
+  email: yup.string().required('Email é obrigatório').email('Email inválido'),
+  weight: yup.number().required('Peso é requerido'),
+  height: yup.number().required('Altura é requerido')
 });
 
 export default function Create(): JSX.Element {
@@ -151,11 +153,27 @@ export default function Create(): JSX.Element {
                 error={errors.email}
               />
             </SimpleGrid>
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Input
+                name="weight"
+                label="Peso (kg)"
+                type="text"
+                {...register('weight')}
+                error={errors.weight}
+              />
+              <Input
+                name="height"
+                label="Altura (m)"
+                type="text"
+                {...register('height')}
+                error={errors.height}
+              />
+            </SimpleGrid>
           </VStack>
 
           <Flex mt="8" justify={['center', 'center', 'flex-end']}>
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/alunos" passHref>
                 <Button as="a" colorScheme="whiteAlpha">
                   Cancelar
                 </Button>
