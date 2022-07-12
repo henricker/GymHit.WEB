@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { useEffect } from "react";
 
 type ModalDetailsProps = {
@@ -14,6 +14,7 @@ export function ModalDetails({ finalRef, initialRef, isOpen, onClose, pupil, onO
 
     useEffect(() => {
       pupil && onOpen()
+      console.log(pupil)
     }, [pupil])
 
     return (
@@ -29,7 +30,9 @@ export function ModalDetails({ finalRef, initialRef, isOpen, onClose, pupil, onO
           <ModalHeader color="#F54A48" textAlign="center" fontSize="1.1rem" mt="2rem">Detalhes do aluno</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <Flex direction="column" width="100%" alignItems="flex-end">
+            <Flex direction="column" width="100%" alignItems="center">
+              <Image src={pupil?.image ?? 'https://icon-library.com/images/generic-user-icon/generic-user-icon-4.jpg'} alt="avatar" width="15rem" height="15rem"/>
+              <Divider mt='1rem' mb="1rem"/>
                 <Flex justifyContent="space-between" width="100%">
                   <Box mb="2rem">
                     <Heading color="#F54A48" fontSize="1rem" mb="1rem">Nome: </Heading>

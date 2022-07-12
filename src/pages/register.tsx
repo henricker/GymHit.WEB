@@ -71,7 +71,8 @@ export default function Register() {
                 accessToken: response.data.accessToken, 
                 email: response.data.email, 
                 profile_url: null, 
-                fantasy_name: response.data.fantasy_name 
+                fantasy_name: response.data.fantasy_name,
+                id: response.data.id,
             });
 
             toast({

@@ -69,23 +69,22 @@ export default function Users({ users }): JSX.Element {
     }
   }, []);
 
-  async function handlePrefetchUser(user_id: number): Promise<void> {
-    await queryClient.prefetchQuery(
-      ['user', user_id],
-      async () => {
-        const response = await api.get(`pupils/${user_id}`);
-    
-        setPupil(response.data);
-        return response.data;
-      },
-      {
-        staleTime: 1000 * 60 * 10, // 10 minutes
-      }
-    );
+  async function handlePrefetchPupil(pupil_id: number): Promise<void> {
+    try {
+      const response = await api.get(`pupils/${pupil_id}`, {
+        headers: {
+          Authorization: `Bearer ${auth.user.accessToken || auth.getAuth().accessToken}`
+        }
+      });
+  
+      setPupil(response.data);
+    } catch(err) {
+      console.log(err);
+    }
   }
 
   useEffect(() => {
-    pupilId && handlePrefetchUser(pupilId);
+    pupilId && handlePrefetchPupil(pupilId);
   }, [pupilId]);
 
   return (
